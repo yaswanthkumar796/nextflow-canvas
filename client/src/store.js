@@ -90,6 +90,26 @@ const useStore = create((set, get) => ({
       });
     } catch (error) {
     }
+  },
+
+  executeNode: async (nodeId, token) => {
+    const { workflowId, nodes } = get();
+    const node = nodes.find(n => n.id === nodeId);
+    if (!node || !workflowId) return;
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      await fetch(`${API_URL}/api/executions/${workflowId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify([node])
+      });
+    } catch (error) {
+      console.error(error);
+    }
   }
 }));
 
