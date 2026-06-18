@@ -93,20 +93,54 @@ const useStore = create((set, get) => ({
   },
 
   executeNode: async (nodeId, token) => {
-    const { workflowId, nodes } = get();
+    const { workflowId, nodes, edges } = get();
     const node = nodes.find(n => n.id === nodeId);
     if (!node || !workflowId) return;
 
+    // Dynamically resolve inputs across wired edges
+    let resolvedData = { ...node.data };
+    const incomingEdges = edges.filter(e => e.target === nodeId);
+    
+    incomingEdges.forEach(edge => {
+      const sourceNode = nodes.find(n => n.id === edge.source);
+      if (sourceNode && sourceNode.type === 'requestInputs') {
+        const field = sourceNode.data.fields?.find(f => f.id === edge.sourceHandle);
+        if (field) {
+          if (edge.targetHandle === 'prompt') resolvedData.prompt = field.value;
+          if (edge.targetHandle === 'system-prompt') resolvedData.systemPrompt = field.value;
+          if (edge.targetHandle === 'image--vision-' || edge.targetHandle === 'input-image') resolvedData.imageUrl = field.value;
+        }
+      }
+    });
+
+    const payloadNode = { ...node, data: resolvedData };
+
     try {
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
-      await fetch(`${API_URL}/api/executions/${workflowId}`, {
+      const response = await fetch(`${API_URL}/api/executions/${workflowId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`
         },
-        body: JSON.stringify([node])
+        body: JSON.stringify([payloadNode])
       });
+      if (!response.ok) {
+        const err = await response.json();
+        console.error("Execution failed:", err);
+      } else {
+        const result = await response.json();
+        // Update the UI with the returned output!
+        if (result.executions && result.executions.length > 0) {
+          result.executions.forEach(exec => {
+            set(state => ({
+              nodes: state.nodes.map(n => 
+                n.id === exec.nodeId ? { ...n, data: { ...n.data, output: exec.output } } : n
+              )
+            }));
+          });
+        }
+      }
     } catch (error) {
       console.error(error);
     }

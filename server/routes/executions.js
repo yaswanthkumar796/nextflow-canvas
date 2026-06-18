@@ -1,6 +1,22 @@
 const express = require('express');
 const router = express.Router();
-const { tasks } = require('@trigger.dev/sdk/v3');
+const { tasks, runs } = require('@trigger.dev/sdk/v3');
+
+async function triggerAndPoll(taskName, payload) {
+  const handle = await tasks.trigger(taskName, payload);
+  let run = await runs.retrieve(handle.id);
+  
+  while (run.status === 'QUEUED' || run.status === 'EXECUTING') {
+    await new Promise(r => setTimeout(r, 1000));
+    run = await runs.retrieve(handle.id);
+  }
+  
+  if (run.status === 'COMPLETED') {
+    return run.output?.text || run.output?.url || run.output;
+  }
+  
+  throw new Error(`Task failed with status: ${run.status}`);
+}
 
 router.post('/:workflowId', async (req, res) => {
   const { workflowId } = req.params;
@@ -8,7 +24,7 @@ router.post('/:workflowId', async (req, res) => {
 
   try {
     const promises = nodes.map(async (node) => {
-      let runId = null;
+      let output = null;
       
       if (node.type === 'cropImage') {
         const payload = {
@@ -18,8 +34,7 @@ router.post('/:workflowId', async (req, res) => {
           width: node.data?.width || 100,
           height: node.data?.height || 100
         };
-        const handle = await tasks.trigger("crop-image", payload);
-        runId = handle.id;
+        output = await triggerAndPoll("crop-image", payload);
       } 
       else if (node.type === 'geminiPro') {
         const payload = {
@@ -27,13 +42,12 @@ router.post('/:workflowId', async (req, res) => {
           systemPrompt: node.data?.systemPrompt || '',
           imageUrl: node.data?.imageUrl || ''
         };
-        const handle = await tasks.trigger("gemini-pro", payload);
-        runId = handle.id;
+        output = await triggerAndPoll("gemini-pro", payload);
       }
       
       return {
         nodeId: node.id,
-        runId
+        output
       };
     });
 
@@ -41,7 +55,7 @@ router.post('/:workflowId', async (req, res) => {
     
     res.json({
       workflowId,
-      executions: results.filter(r => r.runId !== null)
+      executions: results
     });
   } catch (error) {
     res.status(500).json({ error: error.message });

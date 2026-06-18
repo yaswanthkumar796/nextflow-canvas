@@ -1,6 +1,6 @@
 import React from 'react';
 import { BaseEdge, EdgeLabelRenderer, getBezierPath } from '@xyflow/react';
-import useStore from '../../store';
+import useStore from '../store';
 
 export default function DeletableEdge({
   id,

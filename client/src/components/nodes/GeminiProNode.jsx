@@ -1,5 +1,5 @@
 import React from 'react';
-import { Handle, Position, useHandleConnections, useReactFlow } from '@xyflow/react';
+import { Handle, Position, useNodeConnections, useReactFlow } from '@xyflow/react';
 import { useAuth } from '@clerk/clerk-react';
 import useStore from '../../store';
 import './nodes.css';
@@ -11,7 +11,7 @@ export default function GeminiProNode({ id, data }) {
   const { getToken } = useAuth();
   const handles = ['Prompt', 'System Prompt', 'Image (Vision)', 'Video', 'Audio', 'File'];
   
-  const sizeConnections = useHandleConnections({ type: 'target', id: 'size-input' });
+  const sizeConnections = useNodeConnections({ handleType: 'target', handleId: 'size-input' });
   const isSizeConnected = sizeConnections.length > 0;
 
   const handleRun = async () => {
