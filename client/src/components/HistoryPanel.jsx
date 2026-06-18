@@ -13,7 +13,8 @@ export default function HistoryPanel() {
       const fetchHistory = async () => {
         try {
           const token = await getToken();
-          const response = await fetch('http://localhost:5000/api/workflows/history/all', {
+          const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+          const response = await fetch(`${API_URL}/api/workflows/history/all`, {
             headers: { Authorization: `Bearer ${token}` }
           });
           const data = await response.json();

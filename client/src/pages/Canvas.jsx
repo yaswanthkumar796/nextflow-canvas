@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { ReactFlow, Background, MiniMap, Controls, getOutgoers } from '@xyflow/react';
 import { useParams } from 'react-router-dom';
 import { useAuth } from '@clerk/clerk-react';
@@ -31,8 +31,12 @@ const Canvas = () => {
     onConnect,
     loadWorkflow,
     saveWorkflow,
-    setRunningNodes
+    setRunningNodes,
+    setNodes,
+    setEdges
   } = useStore();
+  
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     const fetchAndLoad = async () => {
@@ -74,8 +78,9 @@ const Canvas = () => {
     const nodeIds = nodes.map(n => n.id);
     setRunningNodes(nodeIds);
 
+    const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
     try {
-      await fetch(`http://localhost:5000/api/executions/${id}`, {
+      await fetch(`${API_URL}/api/executions/${id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -89,11 +94,42 @@ const Canvas = () => {
     }
   };
 
+  const handleExport = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ nodes, edges }));
+    const downloadAnchorNode = document.createElement('a');
+    downloadAnchorNode.setAttribute("href", dataStr);
+    downloadAnchorNode.setAttribute("download", "workflow.json");
+    document.body.appendChild(downloadAnchorNode);
+    downloadAnchorNode.click();
+    downloadAnchorNode.remove();
+  };
+
+  const handleImport = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const content = JSON.parse(e.target.result);
+          if (content.nodes && content.edges) {
+            setNodes(content.nodes);
+            setEdges(content.edges);
+          }
+        } catch (error) {}
+      };
+      reader.readAsText(file);
+    }
+    event.target.value = null;
+  };
+
   return (
     <div className="canvas-container">
       <header className="canvas-header">
         <h2>Workflow Editor</h2>
         <div style={{display: 'flex', gap: '10px'}}>
+          <input type="file" accept=".json" style={{display: 'none'}} ref={fileInputRef} onChange={handleImport} />
+          <button className="btn-primary" onClick={() => fileInputRef.current.click()}>Import JSON</button>
+          <button className="btn-primary" onClick={handleExport}>Export JSON</button>
           <button className="btn-primary" onClick={handleRun}>Run Workflow</button>
           <button className="btn-primary" onClick={handleSave}>Save Workflow</button>
         </div>
