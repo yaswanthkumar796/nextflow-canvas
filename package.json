@@ -1,0 +1,9 @@
+{
+  "name": "nextflow-clone",
+  "version": "1.0.0",
+  "description": "NextFlow clone for Vercel deployment",
+  "scripts": {
+    "build": "cd client && npm install && npm run build",
+    "install": "cd server && npm install"
+  }
+}

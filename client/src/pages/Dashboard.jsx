@@ -15,7 +15,7 @@ const Dashboard = () => {
     const fetchWorkflows = async () => {
       try {
         const token = await getToken();
-        const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+        const API_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
         const response = await fetch(`${API_URL}/api/workflows`, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -37,7 +37,7 @@ const Dashboard = () => {
   const handleCreateWorkflow = async () => {
     try {
       const token = await getToken();
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
       const response = await fetch(`${API_URL}/api/workflows`, {
         method: 'POST',
         headers: {

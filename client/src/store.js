@@ -49,7 +49,7 @@ const useStore = create((set, get) => ({
 
   loadWorkflow: async (id, token) => {
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
       const response = await fetch(`${API_URL}/api/workflows/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -79,7 +79,7 @@ const useStore = create((set, get) => ({
     if (!workflowId) return;
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
       await fetch(`${API_URL}/api/workflows/${workflowId}/save`, {
         method: 'PUT',
         headers: {
@@ -116,7 +116,7 @@ const useStore = create((set, get) => ({
     const payloadNode = { ...node, data: resolvedData };
 
     try {
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const API_URL = import.meta.env.PROD ? '' : (import.meta.env.VITE_API_URL || 'http://localhost:5000');
       const response = await fetch(`${API_URL}/api/executions/${workflowId}`, {
         method: 'POST',
         headers: {
