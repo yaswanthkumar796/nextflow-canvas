@@ -12,14 +12,22 @@ router.get('/', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-  const { name, user_id } = req.body;
+  const { userId } = req.body;
   try {
+    if (!userId) throw new Error("Missing userId");
+
+    await db.query(
+      'INSERT INTO users (clerk_id, email) VALUES ($1, $2) ON CONFLICT (clerk_id) DO NOTHING',
+      [userId, 'auto@example.com']
+    );
+
     const { rows } = await db.query(
-      'INSERT INTO workflows (name, user_id) VALUES ($1, $2) RETURNING *',
-      [name, user_id]
+      "INSERT INTO workflows (name, user_id, status) VALUES ($1, $2, 'draft') RETURNING *",
+      ['Untitled Workflow', userId]
     );
     res.status(201).json(rows[0]);
   } catch (err) {
+    console.error("Workflow Creation Error:", err);
     res.status(500).json({ error: err.message });
   }
 });

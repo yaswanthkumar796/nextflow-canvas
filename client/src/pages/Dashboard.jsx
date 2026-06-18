@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react';
-import { UserButton, useAuth } from '@clerk/clerk-react';
+import { UserButton, useAuth, useUser } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 import { PlusCircle, Loader2 } from 'lucide-react';
 import './Dashboard.css';
 
 const Dashboard = () => {
   const { getToken } = useAuth();
+  const { user } = useUser();
+  const navigate = useNavigate();
   const [workflows, setWorkflows] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,6 +34,27 @@ const Dashboard = () => {
     fetchWorkflows();
   }, [getToken]);
 
+  const handleCreateWorkflow = async () => {
+    try {
+      const token = await getToken();
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+      const response = await fetch(`${API_URL}/api/workflows`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`
+        },
+        body: JSON.stringify({ userId: user.id })
+      });
+      const newWorkflow = await response.json();
+      if (newWorkflow && newWorkflow.id) {
+        navigate('/canvas/' + newWorkflow.id);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -45,7 +69,7 @@ const Dashboard = () => {
         <header className="header">
           <h1>My Workflows</h1>
           <div className="header-actions">
-            <button className="btn-primary">
+            <button className="btn-primary" onClick={handleCreateWorkflow}>
               <PlusCircle size={18} />
               <span>Create New Workflow</span>
             </button>
@@ -62,7 +86,7 @@ const Dashboard = () => {
             <div className="empty-state">
               <h2>No Workflows Yet</h2>
               <p>Create your first workflow to get started.</p>
-              <button className="btn-primary">
+              <button className="btn-primary" onClick={handleCreateWorkflow}>
                 <PlusCircle size={18} />
                 <span>Create Workflow</span>
               </button>

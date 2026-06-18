@@ -29,6 +29,12 @@ const useStore = create((set, get) => ({
     });
   },
 
+  removeEdge: (id) => {
+    set({
+      edges: get().edges.filter(e => e.id !== id)
+    });
+  },
+
   setNodes: (nodes) => {
     set({ nodes });
   },

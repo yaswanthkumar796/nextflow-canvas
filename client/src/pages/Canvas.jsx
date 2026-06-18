@@ -9,6 +9,7 @@ import GeminiProNode from '../components/nodes/GeminiProNode';
 import ResponseNode from '../components/nodes/ResponseNode';
 import ToolbarPicker from '../components/ToolbarPicker';
 import HistoryPanel from '../components/HistoryPanel';
+import DeletableEdge from '../components/DeletableEdge';
 import '@xyflow/react/dist/style.css';
 import './Canvas.css';
 
@@ -17,6 +18,10 @@ const nodeTypes = {
   cropImage: CropImageNode,
   geminiPro: GeminiProNode,
   responseNode: ResponseNode,
+};
+
+const edgeTypes = {
+  default: DeletableEdge
 };
 
 const Canvas = () => {
@@ -142,6 +147,7 @@ const Canvas = () => {
           onEdgesChange={onEdgesChange}
           onConnect={onConnect}
           nodeTypes={nodeTypes}
+          edgeTypes={edgeTypes}
           isValidConnection={isValidConnection}
           fitView
         >
