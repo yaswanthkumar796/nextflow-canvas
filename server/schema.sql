@@ -1,0 +1,42 @@
+CREATE TABLE IF NOT EXISTS users (
+  clerk_id VARCHAR PRIMARY KEY,
+  email VARCHAR NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS workflows (
+  id SERIAL PRIMARY KEY,
+  name VARCHAR NOT NULL,
+  user_id VARCHAR REFERENCES users(clerk_id),
+  status VARCHAR DEFAULT 'draft',
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS nodes (
+  id VARCHAR PRIMARY KEY,
+  workflow_id INTEGER REFERENCES workflows(id) ON DELETE CASCADE,
+  type VARCHAR NOT NULL,
+  position_x FLOAT NOT NULL,
+  position_y FLOAT NOT NULL,
+  data JSONB
+);
+
+CREATE TABLE IF NOT EXISTS edges (
+  id VARCHAR PRIMARY KEY,
+  workflow_id INTEGER REFERENCES workflows(id) ON DELETE CASCADE,
+  source VARCHAR NOT NULL,
+  target VARCHAR NOT NULL,
+  source_handle VARCHAR,
+  target_handle VARCHAR
+);
+
+CREATE TABLE IF NOT EXISTS run_history (
+  id SERIAL PRIMARY KEY,
+  workflow_id INTEGER REFERENCES workflows(id) ON DELETE CASCADE,
+  status VARCHAR,
+  mode VARCHAR,
+  started_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  finished_at TIMESTAMP,
+  execution_data JSONB
+);
