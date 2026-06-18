@@ -1,0 +1,148 @@
+.custom-node {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: var(--border-radius);
+  width: 250px;
+  font-family: var(--font-family);
+  color: var(--text-color);
+  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+  overflow: visible;
+}
+
+.node-header {
+  background-color: var(--sidebar-bg);
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 14px;
+  border-bottom: 1px solid var(--border-color);
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+}
+
+.node-content {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field-row, .handle-row {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.handle-row {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+
+.field-label {
+  font-size: 12px;
+  color: #ccc;
+}
+
+.handle-label {
+  font-size: 12px;
+  color: #ccc;
+}
+
+.node-input, .node-select, .node-textarea {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  border-radius: 4px;
+  padding: 6px 8px;
+  font-size: 12px;
+  width: 100%;
+  outline: none;
+}
+
+.node-textarea {
+  resize: vertical;
+  min-height: 40px;
+}
+
+.image-upload {
+  border: 1px dashed var(--border-color);
+  padding: 16px;
+  text-align: center;
+  font-size: 12px;
+  color: #888;
+  border-radius: 4px;
+  background-color: var(--bg-color);
+}
+
+.add-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.add-buttons button {
+  flex: 1;
+  background-color: var(--sidebar-bg);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.add-buttons button:hover {
+  background-color: var(--border-color);
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.input-group label {
+  font-size: 12px;
+  color: #ccc;
+}
+
+.response-block, .response-bucket {
+  background-color: var(--bg-color);
+  border: 1px solid var(--border-color);
+  padding: 10px;
+  font-size: 12px;
+  color: #888;
+  border-radius: 4px;
+  min-height: 60px;
+}
+
+.node-range {
+  width: 100%;
+}
+
+.react-flow__handle {
+  width: 12px;
+  height: 12px;
+  background-color: #fff;
+  border: 2px solid var(--border-color);
+  transition: background-color 0.2s;
+}
+
+.react-flow__handle:hover {
+  background-color: var(--primary-color);
+}
+
+.react-flow__handle-connecting {
+  background-color: var(--primary-color);
+}
+
+@keyframes pulse-purple {
+  0% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0.7); }
+  70% { box-shadow: 0 0 0 10px rgba(168, 85, 247, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(168, 85, 247, 0); }
+}
+
+.node-running {
+  animation: pulse-purple 2s infinite;
+  border-color: #a855f7 !important;
+}
